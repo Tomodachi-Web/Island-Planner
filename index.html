@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/src/style.css" />
+    <title>Tomodachi Life Island Planner</title>
+  </head>
+  <body>
+    <div class="editor-container">
+      <aside class="sidebar">
+        <h2>Island Planner</h2>
+
+        <div class="header-label-row">
+          <label for="map-size">Map Size</label>
+          <div class="compact-check">
+            <label><input type="checkbox" id="toggle-grid" checked /> Show Grid</label>
+          </div>
+        </div>
+
+        <div class="control-grid-deck">
+          <select id="map-size">
+            <option value="48x34">48 × 34</option>
+            <option value="68x48">68 × 48</option>
+            <option value="88x68">88 × 68</option>
+            <option value="118x78" selected>118 × 78</option>
+          </select>
+          <button id="btn-clear-map" class="action-btn danger-btn">Clear Map</button>
+        </div>
+
+        <div class="control-grid-deck">
+          <button id="btn-center" class="action-btn">Center Cam</button>
+          <div class="history-pair-wrapper">
+            <button id="btn-undo" class="action-btn history-btn" title="Undo Last Action">↩️</button>
+            <button id="btn-redo" class="action-btn history-btn" title="Redo Action">↪️</button>
+          </div>
+        </div>
+
+        <div class="control-grid-deck">
+          <button id="btn-save-island" class="action-btn">Save Island</button>
+          <button id="btn-load-island" class="action-btn">Load Island</button>
+          <input type="file" id="load-file-input" accept=".json" style="display:none;" />
+        </div>
+        
+        <hr class="divider" />
+
+        <div class="mode-toolbar">
+          <button class="mode-btn active" id="mode-terrain" title="Terrain Editor">
+            <span>Terrain</span>
+          </button>
+          <button class="mode-btn" id="mode-building" title="Building Editor">
+            <span>Building</span>
+          </button>
+          <button class="mode-btn" id="mode-select" title="Select Editor">
+            <span>Select</span>
+          </button>
+        </div>
+
+        <hr class="divider" />
+
+        <!-- Terrain sub-panel: tool selection, terrain type, brush controls -->
+        <div id="panel-terrain" class="sub-panel">
+          <div class="control-group">
+            <label>Sub-Mode</label>
+            <div class="toggle-buttons">
+              <button id="sub-terrain-normal" class="small-btn active">Normal Mode</button>
+              <button id="sub-terrain-path" class="small-btn">Path Mode</button>
+            </div>
+          </div>
+
+          <div class="control-group">
+            <label>Drawing Tool</label>
+            <div class="toggle-buttons three-way">
+              <button id="tool-brush" class="small-btn active">Brush</button>
+              <button id="tool-bucket" class="small-btn">Bucket</button>
+              <button id="tool-outline" class="small-btn">Outline</button>
+            </div>
+          </div>
+
+          <div class="control-group">
+            <label for="terrain-type">Terrain Type</label>
+            <select id="terrain-type">
+              <option value="arched-cobblestone">Arched Cobblestone</option>
+              <option value="asphalt">Asphalt</option>
+              <option value="bricks">Bricks</option>
+              <option value="cherry-blossoms">Cherry Blossoms</option>
+              <option value="clovers">Clovers</option>
+              <option value="cobblestone">Cobblestone</option>
+              <option value="concrete">Concrete</option>
+              <option value="dirt">Dirt</option>
+              <option value="fallen-leaves">Fallen Leaves</option>
+              <option value="gold-tiles">Gold Tiles</option>
+              <option value="grass" selected>Grass</option>
+              <option value="gravel">Gravel</option>
+              <option value="sand">Sand</option>
+              <option value="sandy-beach">Sandy Beach</option>
+              <option value="sea">Sea</option>
+              <option value="snow">Snow</option>
+              <option value="steel-plate">Steel Plate</option>
+              <option value="tiles">Tiles</option>
+              <option value="wooden-boards">Wooden Boards</option>
+            </select>
+          </div>
+
+          <div id="brush-settings-group">
+            <hr class="panel-divider" />
+
+            <!-- Shown only in outline tool mode -->
+            <div class="control-group id-outline-only hidden" id="outline-thickness-row" style="margin-bottom: 10px;">
+              <label>Outline Style</label>
+              <div class="toggle-buttons">
+                <button id="outline-thin" class="small-btn active">Thin Edge</button>
+                <button id="outline-thick" class="small-btn">Thick Edge</button>
+              </div>
+            </div>
+
+            <div class="control-row">
+              <div class="control-group" style="width: 50%;">
+                <label>Brush Shape</label>
+                <div class="toggle-buttons">
+                  <button id="brush-shape-square" class="small-btn active">Square</button>
+                  <button id="brush-shape-circle" class="small-btn">Circle</button>
+                </div>
+              </div>
+
+              <div class="control-group" style="width: 50%;">
+                <label>Dimensions</label>
+                <div class="brush-dimensions">
+                  <input type="number" id="brush-width"  value="1" min="1" step="1" title="Width"  />
+                  <span class="dim-x">×</span>
+                  <input type="number" id="brush-height" value="1" min="1" step="1" title="Height" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Building sub-panel: name, dimensions, and base color -->
+        <div id="panel-building" class="sub-panel hidden">
+          <div class="control-group">
+            <label for="building-name">Building Name</label>
+            <input type="text" id="building-name" placeholder="Type name here"
+              style="width: 100%; padding: 8px; border: 2px solid #171C31; border-radius: 6px; font-family: 'DreamLife', sans-serif;" />
+          </div>
+
+          <div class="control-row">
+            <div class="control-group" style="width: 50%;">
+              <label>Dimensions</label>
+              <div class="brush-dimensions">
+                <input type="number" id="build-width"  value="1" min="1" step="1" title="Width"  />
+                <span class="dim-x">×</span>
+                <input type="number" id="build-height" value="1" min="1" step="1" title="Height" />
+              </div>
+            </div>
+            <div class="control-group" style="width: 50%;">
+              <label for="building-color">Base Color</label>
+              <input type="color" id="building-color" value="#3a86ff"
+                style="width: 100%; height: 34px; padding: 0; cursor: pointer;" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Select sub-panel: single click or multi-select marquee -->
+        <div id="panel-select" class="sub-panel hidden">
+          <div class="control-group">
+            <div class="compact-check">
+              <label><input type="checkbox" id="toggle-multi-select" /> Enable Multi-Select Box</label>
+            </div>
+          </div>
+          <div id="group-actions-row" class="control-group hidden">
+            <label>Group Actions</label>
+            <div class="toggle-buttons">
+              <button id="btn-group-rotate" class="small-btn">Rotate Group</button>
+              <button id="btn-group-move"   class="small-btn">Move Group</button>
+            </div>
+          </div>
+          <p class="panel-info">Click a building to modify it, or drag a box if Multi-Select is enabled.</p>
+        </div>
+
+        <div class="ui-version">v1.0.0</div>
+      </aside>
+
+      <main class="workspace" id="workspace">
+        <canvas id="island-canvas"></canvas>
+      </main>
+    </div>
+
+    <div id="clear-modal" class="modal-overlay hidden">
+      <div class="modal-box">
+        <h3>Clear Entire Map?</h3>
+        <p>Are you sure you want to reset the island? All your painted terrain will be lost forever!</p>
+        <div class="modal-actions">
+          <button id="modal-yes" class="modal-btn danger">Yes, Reset</button>
+          <button id="modal-no"  class="modal-btn">No, Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
